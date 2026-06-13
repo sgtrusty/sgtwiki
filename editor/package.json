@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun dev.ts",
-    "build": "bun build src/editor/app.ts --outdir public/assets --minify",
-    "build:watch": "bun build src/editor/app.ts --outdir public/assets --watch"
+    "build": "bun build src/app.ts --outdir public/assets --minify",
+    "build:watch": "bun build src/app.ts --outdir public/assets --watch"
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2",
