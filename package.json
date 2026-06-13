@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "dev": "bun run editor:dev & bun run ssg:dev & wait",
-    "editor:dev": "bun cli/index.ts serve",
+    "editor:serve": "bun cli/index.ts serve",
+    "editor:dev": "bun run --cwd editor dev",
     "editor:build": "bun run --cwd editor build",
     "ssg:build": "bun cli/index.ts build",
     "ssg:serve": "bun cli/index.ts serve-ssg",

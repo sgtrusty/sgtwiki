@@ -1,29 +1,29 @@
-import { html, render } from "lit-html"
-import { liveIcon } from "../icons"
+import { html, render } from "lit-html";
+import { liveIcon } from "../icons";
 
 export interface PageNode {
-  weight?: number
+  weight?: number;
 }
 
 export interface TreeNode {
-  [key: string]: TreeNode | PageNode | null
+  [key: string]: TreeNode | PageNode | null;
 }
 
 export interface SidebarActions {
-  onNavigate: (path: string) => void
-  onNewPage: (parentPath: string) => void
-  onDelete: (path: string) => void
-  onRename: (path: string) => void
-  onMove: (from: string, to: string) => void
+  onNavigate: (path: string) => void;
+  onNewPage: (parentPath: string) => void;
+  onDelete: (path: string) => void;
+  onRename: (path: string) => void;
+  onMove: (from: string, to: string) => void;
 }
 
-let menuTarget = ""
-let menuTimer: ReturnType<typeof setTimeout> | null = null
+let menuTarget = "";
+let menuTimer: ReturnType<typeof setTimeout> | null = null;
 
 function closeMenu() {
-  document.querySelectorAll(".ctx-menu").forEach(el => el.remove())
-  document.querySelectorAll(".ctx-backdrop").forEach(el => el.remove())
-  menuTarget = ""
+  document.querySelectorAll(".ctx-menu").forEach((el) => el.remove());
+  document.querySelectorAll(".ctx-backdrop").forEach((el) => el.remove());
+  menuTarget = "";
 }
 
 export function mountSidebar(
@@ -32,135 +32,174 @@ export function mountSidebar(
   current: string,
   actions: SidebarActions,
 ) {
-  const isDev = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  const page = current === "_index" ? "" : `/${current}`
-  const liveUrl = isDev ? `http://localhost:5000${page}` : ""
+  const isDev =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+  const page = current === "_index" ? "" : `/${current}`;
+  const liveUrl = isDev ? `http://localhost:5000${page}` : "";
 
-  function renderItems(
-    items: TreeNode,
-    prefix = "",
-  ): unknown {
-    const entries = Object.entries(items).sort(([nameA, valA], [nameB, valB]) => {
-      if (nameA === "_index.md") return -1
-      if (nameB === "_index.md") return 1
+  function renderItems(items: TreeNode, prefix = ""): unknown {
+    const entries = Object.entries(items).sort(
+      ([nameA, valA], [nameB, valB]) => {
+        if (nameA === "_index.md") return -1;
+        if (nameB === "_index.md") return 1;
 
-      const weightA = valA != null && typeof valA === "object" && "weight" in valA
-        ? (valA as PageNode).weight ?? Infinity
-        : Infinity
-      const weightB = valB != null && typeof valB === "object" && "weight" in valB
-        ? (valB as PageNode).weight ?? Infinity
-        : Infinity
+        const weightA =
+          valA != null && typeof valA === "object" && "weight" in valA
+            ? ((valA as PageNode).weight ?? Infinity)
+            : Infinity;
+        const weightB =
+          valB != null && typeof valB === "object" && "weight" in valB
+            ? ((valB as PageNode).weight ?? Infinity)
+            : Infinity;
 
-      if (weightA !== weightB) return weightA - weightB
-      return nameA.localeCompare(nameB)
-    })
+        if (weightA !== weightB) return weightA - weightB;
+        return nameA.localeCompare(nameB);
+      },
+    );
 
     return entries.map(([name, val]) => {
-      const path = prefix ? `${prefix}/${name}` : name
-      const isPage = val === null || (typeof val === "object" && "weight" in val)
+      const path = prefix ? `${prefix}/${name}` : name;
+      const isPage =
+        val === null || (typeof val === "object" && "weight" in val);
 
       if (isPage) {
-        const pagePath = path.replace(/\.md$/, "")
-        const active = pagePath === current
+        const pagePath = path.replace(/\.md$/, "");
+        const active = pagePath === current;
         const label = name
           .replace(/^_index\.md$/, "Home")
           .replace(/\.md$/, "")
           .replace(/-/g, " ")
-          .replace(/^\w/, (c) => c.toUpperCase())
-        return html`
-          <div class="nav-item" draggable="true"
-            data-nav-path="${pagePath}"
-            @dragstart=${(e: DragEvent) => {
-              e.dataTransfer?.setData("text/plain", pagePath)
-            }}
-            @dragover=${(e: DragEvent) => e.preventDefault()}
-            @drop=${(e: DragEvent) => {
-              e.preventDefault()
-              const from = e.dataTransfer?.getData("text/plain")
-              if (from) actions.onMove(from, pagePath)
-            }}>
-            <a href="/${pagePath}" class="nav-link ${active ? "active" : ""}"
-              @click=${(e: Event) => { e.preventDefault(); actions.onNavigate(pagePath) }}>
-              ${label}
-            </a>
-            <button class="nav-more" @click=${(e: Event) => {
-              e.stopPropagation()
-              showMenu(e.target as HTMLElement, pagePath, actions)
-            }}>⋮</button>
-          </div>`
-      }
-      const children = renderItems(val, path)
-      const label = name.replace(/-/g, " ").replace(/^\w/, (c) => c.toUpperCase())
-      return html`
-        <div class="nav-section"
+          .replace(/^\w/, (c) => c.toUpperCase());
+        return html` <div
+          class="nav-item"
+          draggable="true"
+          data-nav-path="${pagePath}"
+          @dragstart=${(e: DragEvent) => {
+            e.dataTransfer?.setData("text/plain", pagePath);
+          }}
           @dragover=${(e: DragEvent) => e.preventDefault()}
           @drop=${(e: DragEvent) => {
-            e.preventDefault()
-            const from = e.dataTransfer?.getData("text/plain")
-            if (from) {
-              const to = path + "/" + from.split("/").pop()
-              actions.onMove(from, to)
-            }
-          }}>
-          <span class="nav-section-title">${label}</span>
-          <div class="nav-section-children">${children}</div>
-        </div>`
-    })
+            e.preventDefault();
+            const from = e.dataTransfer?.getData("text/plain");
+            if (from) actions.onMove(from, pagePath);
+          }}
+        >
+          <a
+            href="/${pagePath}"
+            class="nav-link ${active ? "active" : ""}"
+            @click=${(e: Event) => {
+              e.preventDefault();
+              actions.onNavigate(pagePath);
+            }}
+          >
+            ${label}
+          </a>
+          <button
+            class="nav-more"
+            @click=${(e: Event) => {
+              e.stopPropagation();
+              showMenu(e.target as HTMLElement, pagePath, actions);
+            }}
+          >
+            ⋮
+          </button>
+        </div>`;
+      }
+      const children = renderItems(val, path);
+      const label = name
+        .replace(/-/g, " ")
+        .replace(/^\w/, (c) => c.toUpperCase());
+      return html` <div
+        class="nav-section"
+        @dragover=${(e: DragEvent) => e.preventDefault()}
+        @drop=${(e: DragEvent) => {
+          e.preventDefault();
+          const from = e.dataTransfer?.getData("text/plain");
+          if (from) {
+            const to = path + "/" + from.split("/").pop();
+            actions.onMove(from, to);
+          }
+        }}
+      >
+        <span class="nav-section-title">${label}</span>
+        <div class="nav-section-children">${children}</div>
+      </div>`;
+    });
   }
 
-  render(html`
-    <div class="sidebar-wrapper">
-      <div class="sidebar-inner">
-        ${renderItems(tree)}
-        <button class="nav-new-page" @click=${() => actions.onNewPage("docs")}>
-          + New Page
-        </button>
-      </div>
-      ${liveUrl ? html`
-        <div class="sidebar-footer">
-          <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="nav-live-link">
-            ${liveIcon}
-            <span>View live version</span>
-          </a>
+  render(
+    html`
+      <div class="sidebar-wrapper">
+        <div class="sidebar-inner">
+          ${renderItems(tree)}
+          <button
+            class="nav-new-page"
+            @click=${() => actions.onNewPage("docs")}
+          >
+            + New Page
+          </button>
         </div>
-      ` : html``}
-    </div>
-  `, container)
+        ${liveUrl
+          ? html`
+              <div class="sidebar-footer">
+                <a
+                  href="${liveUrl}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="nav-live-link"
+                >
+                  ${liveIcon}
+                  <span>View live version</span>
+                </a>
+              </div>
+            `
+          : html``}
+      </div>
+    `,
+    container,
+  );
 }
 
-function showMenu(anchor: HTMLElement, pagePath: string, actions: SidebarActions) {
-  closeMenu()
+function showMenu(
+  anchor: HTMLElement,
+  pagePath: string,
+  actions: SidebarActions,
+) {
+  closeMenu();
 
-  const rect = anchor.getBoundingClientRect()
-  const backdrop = document.createElement("div")
-  backdrop.className = "ctx-backdrop"
-  backdrop.addEventListener("click", closeMenu)
-  document.body.appendChild(backdrop)
+  const rect = anchor.getBoundingClientRect();
+  const backdrop = document.createElement("div");
+  backdrop.className = "ctx-backdrop";
+  backdrop.addEventListener("click", closeMenu);
+  document.body.appendChild(backdrop);
 
-  const menu = document.createElement("div")
-  menu.className = "ctx-menu"
-  menu.style.top = `${rect.bottom + 4}px`
-  menu.style.left = `${rect.left}px`
+  const menu = document.createElement("div");
+  menu.className = "ctx-menu";
+  menu.style.top = `${rect.bottom + 4}px`;
+  menu.style.left = `${rect.left}px`;
   menu.innerHTML = `
     <div data-action="new">New Page</div>
     <div data-action="rename">Rename</div>
     <div data-action="delete">Delete</div>
-  `
+  `;
   menu.addEventListener("click", (e) => {
-    const item = (e.target as HTMLElement).closest("[data-action]") as HTMLElement
-    if (!item) return
-    closeMenu()
+    const item = (e.target as HTMLElement).closest(
+      "[data-action]",
+    ) as HTMLElement;
+    if (!item) return;
+    closeMenu();
     switch (item.dataset.action) {
       case "new":
-        actions.onNewPage(pagePath)
-        break
+        actions.onNewPage(pagePath);
+        break;
       case "rename":
-        actions.onRename(pagePath)
-        break
+        actions.onRename(pagePath);
+        break;
       case "delete":
-        actions.onDelete(pagePath)
-        break
+        actions.onDelete(pagePath);
+        break;
     }
-  })
-  document.body.appendChild(menu)
+  });
+  document.body.appendChild(menu);
 }

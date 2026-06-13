@@ -4,12 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun build src/editor/app.ts --outdir public/assets --watch",
+    "dev": "bun dev.ts",
     "build": "bun build src/editor/app.ts --outdir public/assets --minify",
-    "cli": "bun run cli/index.ts",
-    "serve": "bun run cli/index.ts serve",
-    "serve-ssg": "bun run cli/index.ts serve-ssg",
-    "dev:serve": "bun run cli/index.ts dev"
+    "build:watch": "bun build src/editor/app.ts --outdir public/assets --watch"
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2",
