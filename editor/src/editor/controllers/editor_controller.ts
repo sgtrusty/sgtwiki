@@ -12,7 +12,8 @@ import { gfm } from "@milkdown/kit/preset/gfm"
 import { nord } from "@milkdown/theme-nord"
 import { block } from "@milkdown/kit/plugin/block"
 import { slashFactory } from "@milkdown/kit/plugin/slash"
-import { Plugin, PluginKey } from "@milkdown/kit/prose/state"
+import { EditorState, Plugin, PluginKey } from "@milkdown/kit/prose/state"
+import { parserCtx } from "@milkdown/core"
 import { history } from "@milkdown/kit/plugin/history"
 import { confirmDialog } from "../components/dialogs/dialog"
 import { mountTopbar, type TopbarAPI } from "../components/toolbar/topbar"
@@ -30,7 +31,6 @@ import { normalizeMd } from "../utils/text"
 import { stripFrontmatter, serializeFrontmatter } from "../utils/frontmatter"
 import { createPage, deletePage, renamePage, movePage } from "../editor-actions"
 import {
-  setEditorContent,
   toggleSourceMode,
   applySourceContent,
 } from "../editor-source"
@@ -56,14 +56,16 @@ export default class extends Controller {
   declare topbar: TopbarAPI | null
   declare metaPanel: MetaPanelAPI | null
   declare loading: boolean
-  declare lastSetContent: string
+  declare lastSetContent: Map<string, string>
+  declare editorStates: Map<string, EditorState>
 
   async connect() {
     const urlPath = window.location.pathname.replace(/^\//, "") || "_index"
     this.currentPath = this.data.get("path") || urlPath
     this.sourceMode = false
     this.loading = false
-    this.lastSetContent = ""
+    this.lastSetContent = new Map()
+    this.editorStates = new Map()
 
     const topbarMount = document.getElementById("editor-area")!
     this.topbar = mountTopbar(topbarMount, () => this.milkdown, {
@@ -104,8 +106,28 @@ export default class extends Controller {
     const self = this
 
     if (this.milkdown) {
-      this.lastSetContent = ""
-      setEditorContent(this.milkdown, content)
+      const cached = this.editorStates.get(this.currentPath)
+      if (cached) {
+        this.lastSetContent.set(this.currentPath, "")
+        this.milkdown.action((ctx) => {
+          const view = ctx.get(editorViewCtx)
+          view.updateState(cached)
+        })
+      } else {
+        this.lastSetContent.set(this.currentPath, "")
+        this.milkdown.action((ctx) => {
+          const parser = ctx.get(parserCtx)
+          const view = ctx.get(editorViewCtx)
+          const doc = parser(content)
+          const newState = EditorState.create({
+            schema: view.state.schema,
+            doc,
+            plugins: view.state.plugins,
+          })
+          view.updateState(newState)
+          this.editorStates.set(this.currentPath, newState)
+        })
+      }
       updateDirtyCounter(this.topbar)
       return
     }
@@ -123,16 +145,17 @@ export default class extends Controller {
             view: () => ({
               update: (view, prevState) => {
                 if (!prevState) return
-                if (self.lastSetContent === "") {
+                const prevLastSet = self.lastSetContent.get(self.currentPath) ?? ""
+                if (prevLastSet === "") {
                   const serializer = ctx.get(serializerCtx)
-                  self.lastSetContent = normalizeMd(serializer(view.state.doc))
+                  self.lastSetContent.set(self.currentPath, normalizeMd(serializer(view.state.doc)))
                   return
                 }
                 if (view.state.doc.eq(prevState.doc)) return
                 const serializer = ctx.get(serializerCtx)
                 const md = normalizeMd(serializer(view.state.doc))
-                if (md === self.lastSetContent) return
-                self.lastSetContent = md
+                if (md === prevLastSet) return
+                self.lastSetContent.set(self.currentPath, md)
                 cache.setBody(self.currentPath, md)
                 cache.sync()
                 updateDirtyCounter(self.topbar)
@@ -157,6 +180,7 @@ export default class extends Controller {
     this.milkdown.action((ctx) => {
       const view = ctx.get(editorViewCtx)
       view.dispatch(view.state.tr)
+      this.editorStates.set(this.currentPath, view.state)
     })
     updateDirtyCounter(this.topbar)
   }
@@ -222,6 +246,14 @@ export default class extends Controller {
   async doNavigate(path: string, pushHistory = true) {
     if (this.loading) return
     this.loading = true
+
+    if (this.milkdown) {
+      this.milkdown.action((ctx) => {
+        const view = ctx.get(editorViewCtx)
+        this.editorStates.set(this.currentPath, view.state)
+      })
+    }
+
     this.currentPath = path
 
     document.getElementById("source-editor")!.style.display = "none"
@@ -254,8 +286,10 @@ export default class extends Controller {
     updateDirtyCounter(this.topbar)
 
     if (this.currentPath === pagePath) {
+      this.editorStates.delete(pagePath)
       this.doNavigate("_index", true)
     } else {
+      this.editorStates.delete(pagePath)
       await this.loadSidebar()
     }
   }
@@ -287,8 +321,10 @@ export default class extends Controller {
     updateDirtyCounter(this.topbar)
 
     if (this.currentPath === pagePath) {
+      this.editorStates.delete(pagePath)
       this.doNavigate(newPath, true)
     } else {
+      this.editorStates.delete(pagePath)
       await this.loadSidebar()
     }
   }
@@ -308,8 +344,11 @@ export default class extends Controller {
     updateDirtyCounter(this.topbar)
 
     if (this.currentPath === from) {
+      this.editorStates.delete(from)
       this.doNavigate(to, false)
       window.history.replaceState({ path: to }, "", `/${to === "_index" ? "" : to}`)
+    } else {
+      this.editorStates.delete(from)
     }
     await this.loadSidebar()
   }
@@ -351,7 +390,7 @@ export default class extends Controller {
     const textarea = document.querySelector("#source-editor textarea") as HTMLTextAreaElement
     if (!textarea || !this.milkdown) return
 
-    this.lastSetContent = ""
+    this.lastSetContent.set(this.currentPath, "")
     applySourceContent(this.milkdown, textarea)
 
     const md = this.milkdown.action((ctx) => {
@@ -447,6 +486,7 @@ export default class extends Controller {
     updateDirtyCounter(this.topbar)
 
     if (pagePath === this.currentPath) {
+      this.editorStates.delete(pagePath)
       const res = await fetch(`/content/${pagePath}.md`)
       const raw = res.ok ? await res.text() : ""
       const { frontmatter, body } = stripFrontmatter(raw)
@@ -491,6 +531,7 @@ export default class extends Controller {
       this.currentPath,
       {
         onDiscard: (path) => {
+          this.editorStates.delete(path)
           cache.clearPath(path)
           cache.sync()
           updateDirtyCounter(this.topbar)
@@ -519,6 +560,7 @@ export default class extends Controller {
         onDiscardAll: async () => {
           const paths = cache.getDirtyPaths()
           for (const path of paths) {
+            this.editorStates.delete(path)
             cache.clearPath(path)
           }
           cache.sync()
