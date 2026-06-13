@@ -1,5 +1,5 @@
 import { html, render } from "lit-html"
-import { loadPrefs, savePrefs, type WikiPrefs } from "../storage"
+import { loadPrefs, savePrefs, type WikiPrefs } from "../../storage"
 
 function createOverlay(): HTMLDivElement {
   const existing = document.getElementById("sgtwiki-dialog-overlay")

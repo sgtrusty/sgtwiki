@@ -1,5 +1,5 @@
 import { html, render } from "lit-html"
-import { liveIcon } from "./icons"
+import { liveIcon } from "../icons"
 
 export interface PageNode {
   weight?: number

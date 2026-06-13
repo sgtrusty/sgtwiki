@@ -1,4 +1,4 @@
-import type { MetaPanelData } from "./components/meta-panel"
+import type { MetaPanelData } from "./components/panels/meta-panel"
 import { saveStorage, type WikiStorage } from "./storage"
 
 export interface EditorTracker {

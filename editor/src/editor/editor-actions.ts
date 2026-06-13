@@ -1,6 +1,6 @@
-import { confirmDialog, promptDialog } from "./components/dialog"
+import { confirmDialog, promptDialog } from "./components/dialogs/dialog"
 import { serializeFrontmatter } from "./utils/frontmatter"
-import type { MetaPanelData } from "./components/meta-panel"
+import type { MetaPanelData } from "./components/panels/meta-panel"
 
 export async function createPage(
   parentPath: string,

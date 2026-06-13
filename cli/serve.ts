@@ -1,9 +1,9 @@
 import { existsSync, readdirSync, statSync, mkdirSync, rmSync, copyFileSync, readFileSync } from "fs";
-import { join, extname, basename, dirname } from "path";
+import { join, extname, dirname } from "path";
 
-const CONTENT_DIR = join(import.meta.dir, "..", "..", "content");
-const EDITOR_SRC = join(import.meta.dir, "..", "..", "editor", "static");
-const EDITOR_DIR = join(import.meta.dir, "..", "..", "editor", "public");
+const CONTENT_DIR = join(import.meta.dir, "..", "content");
+const EDITOR_SRC = join(import.meta.dir, "..", "editor", "static");
+const EDITOR_DIR = join(import.meta.dir, "..", "editor", "public");
 const PORT = parseInt(process.env.PORT || "3000");
 const HOST = process.env.HOST || "0.0.0.0";
 
@@ -49,13 +49,13 @@ function buildTree(dir: string): Record<string, any> {
   return result;
 }
 
-// Copy static files (index.html, etc) from editor/static to editor/public
 copyEditorStatic();
 
-// Build editor bundle on first serve
-Bun.spawnSync(["bun", "run", "build"], {
-  cwd: join(import.meta.dir, "..", "..", "editor"),
-});
+if (!existsSync(join(EDITOR_DIR, "app.js"))) {
+  Bun.spawnSync(["bun", "run", "build"], {
+    cwd: join(import.meta.dir, "..", "editor"),
+  });
+}
 
 Bun.serve({
   port: PORT,
@@ -64,7 +64,6 @@ Bun.serve({
     const url = new URL(req.url);
     const path = url.pathname;
 
-    // Content API — read/write markdown files
     if (path === "/content" || path.startsWith("/content/")) {
       const relPath = path.slice("/content/".length);
       const filePath = join(CONTENT_DIR, relPath);
@@ -72,9 +71,7 @@ Bun.serve({
       const target = hasExt ? filePath : filePath + ".md";
 
       if (req.method === "GET") {
-        if (!existsSync(target)) {
-          return new Response(null, { status: 404 });
-        }
+        if (!existsSync(target)) return new Response(null, { status: 404 });
         const file = Bun.file(target);
         return new Response(file, {
           headers: {
@@ -91,11 +88,8 @@ Bun.serve({
       }
 
       if (req.method === "DELETE") {
-        if (!existsSync(target)) {
-          return new Response(null, { status: 404 });
-        }
+        if (!existsSync(target)) return new Response(null, { status: 404 });
         rmSync(target, { force: true });
-        // Clean up empty parent dirs up to content root
         let dir = dirname(target);
         while (dir.startsWith(CONTENT_DIR)) {
           const entries = readdirSync(dir);
@@ -109,14 +103,12 @@ Bun.serve({
       return new Response(null, { status: 405 });
     }
 
-    // API — content tree
     if (path === "/api/tree") {
       return new Response(JSON.stringify(buildTree(CONTENT_DIR)), {
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // API — move/rename a page
     if (path === "/api/move" && req.method === "POST") {
       const { from, to } = await req.json();
       const src = join(CONTENT_DIR, from.replace(/^\//, ""));
@@ -141,16 +133,12 @@ Bun.serve({
       return new Response("ok");
     }
 
-    // Editor app static files
     const editorPath = join(EDITOR_DIR, path === "/" ? "index.html" : path);
     if (existsSync(editorPath)) {
-      const file = Bun.file(editorPath);
-      return new Response(file);
+      return new Response(Bun.file(editorPath));
     }
 
-    // SPA fallback — serve editor shell for any unmatched path
-    const indexFile = Bun.file(join(EDITOR_DIR, "index.html"));
-    return new Response(indexFile);
+    return new Response(Bun.file(join(EDITOR_DIR, "index.html")));
   },
 });
 

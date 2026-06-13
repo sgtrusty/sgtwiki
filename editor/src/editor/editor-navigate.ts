@@ -1,7 +1,7 @@
-import type { TreeNode } from "./components/sidebar"
+import type { TreeNode } from "./components/panels/sidebar"
 import { setPageList, setPageTitles } from "./pages"
 import { stripFrontmatter } from "./utils/frontmatter"
-import type { MetaPanelData } from "./components/meta-panel"
+import type { MetaPanelData } from "./components/panels/meta-panel"
 
 export async function fetchPageContent(path: string): Promise<{
   content: string

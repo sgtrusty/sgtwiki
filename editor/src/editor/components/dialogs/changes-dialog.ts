@@ -1,8 +1,8 @@
 import { html, render } from "lit-html"
 import { diffLines } from "diff"
-import { miniWindow } from "./ui"
+import { miniWindow } from "../ui"
 import { pressTwiceButton } from "./press-twice-button"
-import { colors } from "../theme"
+import { colors } from "../../theme"
 import type { MetaPanelData } from "./meta-panel"
 
 function createOverlay(): HTMLDivElement {

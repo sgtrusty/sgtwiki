@@ -3,16 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "editor",
-    "cli"
+    "editor"
   ],
   "scripts": {
     "dev": "bun run editor:dev & bun run ssg:dev & wait",
-    "editor:dev": "bun run --cwd cli serve",
+    "editor:dev": "bun cli/index.ts serve",
     "editor:build": "bun run --cwd editor build",
-    "ssg:build": "bun run --cwd cli build",
-    "ssg:serve": "bun run --cwd cli serve-ssg",
-    "ssg:dev": "bun run --cwd cli dev",
-    "fetch-deps": "bun run --cwd cli fetch-deps"
+    "ssg:build": "bun cli/index.ts build",
+    "ssg:serve": "bun cli/index.ts serve-ssg",
+    "ssg:dev": "bun cli/index.ts dev",
+    "fetch-deps": "bun cli/index.ts fetch-deps"
   }
 }

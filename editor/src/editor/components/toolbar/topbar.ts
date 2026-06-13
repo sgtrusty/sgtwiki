@@ -1,5 +1,5 @@
 import { html, render } from "lit-html"
-import { colors } from "../theme"
+import { colors } from "../../theme"
 import type { Editor } from "@milkdown/kit/core"
 import { commandsCtx, editorViewCtx } from "@milkdown/kit/core"
 import {
@@ -8,7 +8,7 @@ import {
   toggleInlineCodeCommand,
 } from "@milkdown/kit/preset/commonmark"
 import { toggleStrikethroughCommand } from "@milkdown/kit/preset/gfm"
-import { mountLinkDialog } from "./link-dialog"
+import { mountLinkDialog } from "../dialogs/link-dialog"
 
 export interface TopbarAPI {
   updateCounter(count: number, totalBytes: number): void

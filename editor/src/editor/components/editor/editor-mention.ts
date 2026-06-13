@@ -2,7 +2,7 @@ import { SlashProvider } from "@milkdown/kit/plugin/slash"
 import type { EditorView, EditorState } from "@milkdown/kit/prose/view"
 import { editorViewCtx } from "@milkdown/kit/core"
 import type { Ctx } from "@milkdown/kit/ctx"
-import { getPageList, getPageTitles } from "../pages"
+import { getPageList, getPageTitles } from "../../pages"
 
 export class MentionView {
   provider: SlashProvider

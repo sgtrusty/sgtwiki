@@ -1,22 +1,23 @@
 #!/usr/bin/env bun
 
-const [cmd, ...args] = process.argv.slice(2)
+const [cmd] = process.argv.slice(2)
 
 switch (cmd) {
   case "serve":
     await import("./serve")
     break
   case "build":
-    await import("./build")
-    break
   case "serve-ssg":
-    await import("./serve-ssg")
+  case "dev": {
+    const ssg = await import("./ssg")
+    if (cmd === "build") await ssg.build()
+    else if (cmd === "serve-ssg") await ssg.servePreview()
+    else await ssg.dev()
     break
-  case "dev":
-    await import("./dev")
-    break
+  }
   case "fetch-deps":
-    await import("./fetch-deps")
+    const { fetchDeps } = await import("./fetch-deps")
+    await fetchDeps()
     break
   default:
     console.log(`Usage: sgtwiki {serve|build|serve-ssg|dev|fetch-deps}
