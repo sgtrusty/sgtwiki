@@ -29,11 +29,19 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
+}
+.book-menu .sidebar-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100vh;
 }
 .sidebar-inner {
   padding: 1.5rem 0;
   flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 .sidebar-inner .nav-item {
   display: flex;
@@ -106,6 +114,13 @@ body {
 .nav-new-page:hover {
   background: #e5e9f0;
   border-color: #5e81ac;
+}
+.sidebar-footer {
+  margin-top: auto;
+  padding: 0.75rem;
+  border-top: 1px solid #d8dee9;
+  background: #f8f9fa;
+  flex-shrink: 0;
 }
 
 .ctx-backdrop {
@@ -268,6 +283,18 @@ body {
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.meta-panel-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100%;
+}
+.meta-panel {
+  flex: 1;
+  font-size: 0.85rem;
 }
 
 .meta-panel {
@@ -352,6 +379,59 @@ body {
   background: #e5e9f0;
   border-color: #5e81ac;
 }
+.meta-panel-footer {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid #d8dee9;
+  padding-bottom: 0.5rem;
+}
+.github-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: #24292e;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  background: #f6f8fa;
+  border: 1px solid #d0d7de;
+  transition: all 0.2s ease;
+}
+.github-link:hover {
+  background: #f3f4f6;
+  border-color: #24292e;
+  color: #24292e;
+}
+.github-icon {
+  width: 18px;
+  height: 18px;
+}
+.nav-live-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: #2e3440;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  background: #e7f3e8;
+  border: 1px solid #b8d9ba;
+  transition: all 0.2s ease;
+}
+.nav-live-link:hover {
+  background: #d4e8d6;
+  border-color: #5eac66;
+  color: #2e3440;
+}
+.live-icon {
+  width: 16px;
+  height: 16px;
+  color: #5eac66;
+}
 #source-editor {
   display: none;
   flex: 1;
@@ -396,4 +476,3 @@ body {
   color: #fff;
   border-color: #5e81ac;
 }
-

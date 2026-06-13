@@ -30,3 +30,11 @@ A single binary via `bun build --compile` would bundle the CLI, server, and edit
 ## Hosting
 
 The `build/` output is a portable static site compatible with any static host — GitHub Pages, Surge, Netlify, Vercel, or plain S3.
+
+## Ecosystem
+
+There is a wiki / documentation ecosystem based around Markdown. For similar projects, see:
+
+* [Writebook](https://github.com/basecamp/writebook) used for writing actual books, has a nice template view and looks like minimal boilerplate.
+
+* [Docusaurus](https://docusaurus.io/) seems like a nice option, but it's React based and might be too bloated for my inquiries.

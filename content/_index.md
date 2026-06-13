@@ -7,6 +7,10 @@ type: docs
 
 <br />
 
+[![GitHub](https://img.shields.io/badge/GitHub-View%20on%20GitHub-181717?style=for-the-badge\&logo=github)](https://github.com/sgtrusty/sgtwiki)
+
+***
+
 A two-layer wiki: edit markdown in a live WYSIWYG editor, export as a static site via Hugo.
 
 * [Getting Started](/docs/getting-started) — set up and make your first edit
