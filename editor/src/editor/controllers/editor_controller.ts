@@ -37,7 +37,7 @@ import {
 
 const slash = slashFactory("sgtwiki")
 
-let mentionPlugin: ReturnType<typeof Plugin> | null = null
+let mentionPlugin: Plugin | null = null
 
 function updateDirtyCounter(topbar: TopbarAPI | null) {
   let totalBytes = 0
@@ -146,7 +146,7 @@ export default class extends Controller {
           return plugins.concat(dirtyPlugin, mentionPlugin)
         })
       })
-      .use(nord)
+      .use(nord as any)
       .use(commonmark)
       .use(gfm)
       .use(block)

@@ -106,7 +106,7 @@ export function mountSidebar(
           </button>
         </div>`;
       }
-      const children = renderItems(val, path);
+      const children = renderItems(val as TreeNode, path);
       const label = name
         .replace(/-/g, " ")
         .replace(/^\w/, (c) => c.toUpperCase());

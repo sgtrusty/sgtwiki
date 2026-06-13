@@ -75,7 +75,7 @@ export function mountTopbar(
 
   render(tmpl, container)
 
-  const toolbar = container.querySelector(".editor-toolbar")
+  const toolbar = container.querySelector(".editor-toolbar") as HTMLElement
   if (toolbar && container.parentElement) {
     container.parentElement.insertBefore(toolbar, container.parentElement.firstChild)
   }
@@ -98,7 +98,7 @@ export function mountTopbar(
       el.classList.toggle("clickable", true)
     },
     setDirtyState(hasDirty: boolean) {
-      const flush = document.getElementById(flushId)
+      const flush = document.getElementById(flushId) as HTMLButtonElement
       if (flush) flush.disabled = !hasDirty
     },
   }

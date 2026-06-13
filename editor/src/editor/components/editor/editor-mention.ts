@@ -1,5 +1,6 @@
 import { SlashProvider } from "@milkdown/kit/plugin/slash"
-import type { EditorView, EditorState } from "@milkdown/kit/prose/view"
+import type { EditorView } from "@milkdown/kit/prose/view"
+import type { EditorState } from "@milkdown/kit/prose/state"
 import { editorViewCtx } from "@milkdown/kit/core"
 import type { Ctx } from "@milkdown/kit/ctx"
 import { getPageList, getPageTitles } from "../../pages"

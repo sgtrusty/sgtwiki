@@ -3,7 +3,7 @@ import { diffLines } from "diff"
 import { miniWindow } from "../ui"
 import { pressTwiceButton } from "./press-twice-button"
 import { colors } from "../../theme"
-import type { MetaPanelData } from "./meta-panel"
+import type { MetaPanelData } from "../panels/meta-panel"
 
 function createOverlay(): HTMLDivElement {
   const existing = document.getElementById("sgtwiki-dialog-overlay")
@@ -131,13 +131,13 @@ export function mountChangesDialog(
 
   render(tmpl, overlay)
 
-  const windowEl = overlay.querySelector(".sgtwiki-window")!
-  const bodyEl = overlay.querySelector(".sgtwiki-window-body")!
+  const windowEl = overlay.querySelector(".sgtwiki-window") as HTMLElement
+  const bodyEl = overlay.querySelector(".sgtwiki-window-body") as HTMLElement
 
   changes.forEach((data, idx) => {
-    const item = bodyEl.querySelectorAll(".sgtwiki-changes-item")[idx]
-    const preview = item.querySelector(".sgtwiki-changes-preview")
-    const header = item.querySelector(".sgtwiki-changes-header")
+    const item = bodyEl.querySelectorAll(".sgtwiki-changes-item")[idx] as HTMLElement
+    const preview = item.querySelector(".sgtwiki-changes-preview") as HTMLElement
+    const header = item.querySelector(".sgtwiki-changes-header") as HTMLElement
 
     header!.addEventListener("click", () => {
       const isOpen = preview!.style.display === "block"
@@ -150,8 +150,9 @@ export function mountChangesDialog(
       actions.onNavigate(data.path)
     })
 
-    const placeholder = item.querySelector(".sgtwiki-discard-placeholder")!
-    const discardBtn = pressTwiceButton({
+    const placeholder = item.querySelector(".sgtwiki-discard-placeholder") as HTMLElement
+    let discardBtn: HTMLButtonElement
+    discardBtn = pressTwiceButton({
       idleText: "Discard",
       pendingText: "Press again",
       variant: "danger",
@@ -179,8 +180,8 @@ export function mountChangesDialog(
 
       let html = ""
 
-      const origFm = origStripped.frontmatter || {}
-      const modFm = modStripped.frontmatter || {}
+      const origFm = origStripped.frontmatter || {} as MetaPanelData
+      const modFm = modStripped.frontmatter || {} as MetaPanelData
       const allKeys = new Set([...Object.keys(origFm), ...Object.keys(modFm)])
       const changedKeys = [...allKeys].filter(k => origFm[k as keyof MetaPanelData] !== modFm[k as keyof MetaPanelData])
 
@@ -235,9 +236,9 @@ export function mountChangesDialog(
 
       preview!.innerHTML = html || `<div style="padding:8px;color:#888;text-align:center">No changes</div>`
 
-      preview!.querySelectorAll("[data-line]").forEach((el: Element) => {
+      preview!.querySelectorAll("[data-line]").forEach((el) => {
         const lineDiv = el as HTMLElement
-        const jumpBtn = lineDiv.querySelector("[data-jump]")
+        const jumpBtn = lineDiv.querySelector("[data-jump]") as HTMLElement
         if (jumpBtn) {
           lineDiv.addEventListener("mouseenter", () => {
             jumpBtn.style.opacity = "1"
@@ -277,13 +278,14 @@ export function mountChangesDialog(
     onClose()
   }
 
-  overlay.querySelector('[data-action="save-all"]')!.addEventListener("click", () => {
+  (overlay.querySelector('[data-action="save-all"]') as HTMLElement).addEventListener("click", () => {
     actions.onFlushAll()
     closeDialog()
   })
 
-  const discardAllPlaceholder = overlay.querySelector(".sgtwiki-discard-all-placeholder")!
-  const discardAllBtn = pressTwiceButton({
+  const discardAllPlaceholder = overlay.querySelector(".sgtwiki-discard-all-placeholder") as HTMLElement;
+  let discardAllBtn: HTMLButtonElement;
+  discardAllBtn = pressTwiceButton({
     idleText: "Discard all",
     pendingText: "Press again",
     variant: "danger",
@@ -291,10 +293,10 @@ export function mountChangesDialog(
       actions.onDiscardAll()
       closeDialog()
     },
-  })
-  discardAllPlaceholder.replaceWith(discardAllBtn)
+  });
+  discardAllPlaceholder.replaceWith(discardAllBtn);
 
-  overlay.querySelector('[data-action="close"]')!.addEventListener("click", closeDialog)
+  (overlay.querySelector('[data-action="close"]') as HTMLElement).addEventListener("click", closeDialog)
 
   overlay.addEventListener("click", closeDialog)
 
