@@ -1,0 +1,15 @@
+build/
+public/
+bin/
+resources/
+editor/public/assets/
+editor/node_modules/
+cli/node_modules/
+node_modules/
+
+# Reference docs (to be removed)
+docs/ref-*
+
+.DS_Store
+*.local
+.hugo_build.lock

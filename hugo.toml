@@ -1,0 +1,10 @@
+baseURL = "/"
+title = "sgtwiki"
+theme = "book"
+contentDir = "content"
+disableKinds = ["RSS", "sitemap"]
+
+[params]
+  BookSearch = true
+  BookTheme = "auto"
+  BookSection = "docs"
