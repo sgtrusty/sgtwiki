@@ -2,7 +2,6 @@
 
 <div align="center">
 
-[![GitHub](https://img.shields.io/badge/GitHub-View%20on%20GitHub-181717?style=for-the-badge&logo=github)](https://github.com/sgtrusty/sgtwiki)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
 [![Sponsors](https://img.shields.io/badge/Sponsors-BECOME%20A%20SPONSOR-ea4aaa?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/sgtrusty)
 [![Stars](https://img.shields.io/github/stars/sgtrusty/sgtwiki?style=for-the-badge&logo=github)](https://github.com/sgtrusty/sgtwiki/stargazers)

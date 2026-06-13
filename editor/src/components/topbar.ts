@@ -1,8 +1,14 @@
 import { html, render } from "lit-html"
 import { colors } from "../theme"
 import type { Editor } from "@milkdown/kit/core"
-import { editorViewCtx } from "@milkdown/kit/core"
-import { toggleMark } from "prosemirror-commands"
+import { commandsCtx, editorViewCtx } from "@milkdown/kit/core"
+import {
+  toggleStrongCommand,
+  toggleEmphasisCommand,
+  toggleInlineCodeCommand,
+} from "@milkdown/kit/preset/commonmark"
+import { toggleStrikethroughCommand } from "@milkdown/kit/preset/gfm"
+import { mountLinkDialog } from "./link-dialog"
 
 export interface TopbarAPI {
   updateCounter(count: number, totalBytes: number): void
@@ -25,26 +31,24 @@ export function mountTopbar(
     if (!milkdown) return
     milkdown.action((ctx) => {
       const view = ctx.get(editorViewCtx)
-      const { state, dispatch } = view
-      const { schema } = state
+      view.focus()
+      const commands = ctx.get(commandsCtx)
       switch (cmd) {
         case "bold":
-          toggleMark(schema.marks.strong)(state, dispatch)
+          commands.call(toggleStrongCommand.key)
           break
         case "italic":
-          toggleMark(schema.marks.em)(state, dispatch)
+          commands.call(toggleEmphasisCommand.key)
           break
         case "strike":
-          toggleMark(schema.marks.strikethrough)(state, dispatch)
+          commands.call(toggleStrikethroughCommand.key)
           break
         case "code":
-          toggleMark(schema.marks.code)(state, dispatch)
+          commands.call(toggleInlineCodeCommand.key)
           break
-        case "link": {
-          const url = prompt("URL:")
-          if (url) toggleMark(schema.marks.link, { href: url })(state, dispatch)
+        case "link":
+          mountLinkDialog(getEditor)
           break
-        }
       }
     })
   }

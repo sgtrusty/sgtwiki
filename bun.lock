@@ -24,6 +24,7 @@
         "@milkdown/core": "^7.21.2",
         "@milkdown/kit": "^7.21.2",
         "@milkdown/plugin-listener": "^7.21.2",
+        "@milkdown/preset-gfm": "7.21.2",
         "@milkdown/theme-nord": "^7.21",
         "@types/diff": "^8.0.0",
         "diff": "^9.0.0",

@@ -8,6 +8,7 @@ import {
   prosePluginsCtx,
 } from "@milkdown/kit/core"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
+import { gfm } from "@milkdown/kit/preset/gfm"
 import { nord } from "@milkdown/theme-nord"
 import { block } from "@milkdown/kit/plugin/block"
 import { slashFactory } from "@milkdown/kit/plugin/slash"
@@ -147,6 +148,7 @@ export default class extends Controller {
       })
       .use(nord)
       .use(commonmark)
+      .use(gfm)
       .use(block)
       .use(slash)
       .use(history)
